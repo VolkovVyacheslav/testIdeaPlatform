@@ -72,9 +72,7 @@ public class TestIdeaPlatformApplication {
     }
 
     private static Duration getFlightTime(Ticket ticket){
-        LocalTime start = LocalTime.of(ticket.getDepartureTime().getHour(), ticket.getDepartureTime().getMinute());
-        LocalTime end = LocalTime.of(ticket.getArrivalTime().getHour(), ticket.getArrivalTime().getMinute());
-        return Duration.between(start, end);
+          return Duration.between(ticket.getDepartureTime(), ticket.getArrivalTime());
     }
 
     private static  BigDecimal median(Tickets tickets){
