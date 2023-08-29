@@ -45,14 +45,16 @@ public class TestIdeaPlatformApplication {
         }
         Map<String, List<Duration>> results = new HashMap<>();
         for (Ticket ticket : tickets.getTickets()) {
-            if (!results.containsKey(ticket.getCarrier())) {
-                List<Duration> minimumTime = new ArrayList<>();
-                Duration flightTime = Duration.between(ticket.getDepartureTime(), ticket.getArrivalTime());
-                minimumTime.add(flightTime);
-                results.put(ticket.getCarrier(), minimumTime);
-            } else {
-                results.get(ticket.getCarrier()).add(Duration.between(ticket.getDepartureTime(), ticket.getArrivalTime()));
-                Collections.sort(results.get(ticket.getCarrier()));
+            if(ticket.getOrigin().equals("VVO") && ticket.getDestination().equals("TLV")) {
+                if (!results.containsKey(ticket.getCarrier())) {
+                    List<Duration> minimumTime = new ArrayList<>();
+                    Duration flightTime = Duration.between(ticket.getDepartureTime(), ticket.getArrivalTime());
+                    minimumTime.add(flightTime);
+                    results.put(ticket.getCarrier(), minimumTime);
+                } else {
+                    results.get(ticket.getCarrier()).add(Duration.between(ticket.getDepartureTime(), ticket.getArrivalTime()));
+                    Collections.sort(results.get(ticket.getCarrier()));
+                }
             }
         }
         for (Map.Entry<String, List<Duration>> result : results.entrySet()) {
@@ -61,7 +63,7 @@ public class TestIdeaPlatformApplication {
     }
 
     private static  BigDecimal median(Tickets tickets){
-        List<BigDecimal> prices = tickets.getTickets().stream().map(ticket -> ticket.getPrice()).collect(Collectors.toList());
+        List<BigDecimal> prices = getPrices(tickets);
         Collections.sort(prices);
         return prices.size()%2==0 ?
                 ((prices.get(prices.size()/2-1).add(prices.get(prices.size()/2))).divide(new BigDecimal(2))):
@@ -69,12 +71,18 @@ public class TestIdeaPlatformApplication {
     }
 
     private static BigDecimal average(Tickets tickets){
-        List<BigDecimal> prices = tickets.getTickets().stream().map(ticket -> ticket.getPrice()).collect(Collectors.toList());
+        List<BigDecimal> prices = getPrices(tickets);
         BigDecimal result = new BigDecimal(0);
         for(BigDecimal price: prices){
             result =  result.add(price);
         }
         return result.divide(new BigDecimal(prices.size()), RoundingMode.HALF_UP);
+    }
+
+    private static List<BigDecimal> getPrices(Tickets tickets){
+        return tickets.getTickets().stream().
+                filter(ticket -> ticket.getOrigin().equals("VVO") && ticket.getDestination().equals("TLV")).
+                map(ticket -> ticket.getPrice()).collect(Collectors.toList());
     }
 
 }
