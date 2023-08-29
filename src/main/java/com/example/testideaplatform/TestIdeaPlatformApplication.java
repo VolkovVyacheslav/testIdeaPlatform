@@ -12,8 +12,17 @@ import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.time.Duration.ZERO;
+import static java.time.Duration.between;
 
 
 public class TestIdeaPlatformApplication {
@@ -48,11 +57,11 @@ public class TestIdeaPlatformApplication {
             if(ticket.getOrigin().equals("VVO") && ticket.getDestination().equals("TLV")) {
                 if (!results.containsKey(ticket.getCarrier())) {
                     List<Duration> minimumTime = new ArrayList<>();
-                    Duration flightTime = Duration.between(ticket.getDepartureTime(), ticket.getArrivalTime());
+                    Duration flightTime = getFlightTime(ticket);
                     minimumTime.add(flightTime);
                     results.put(ticket.getCarrier(), minimumTime);
                 } else {
-                    results.get(ticket.getCarrier()).add(Duration.between(ticket.getDepartureTime(), ticket.getArrivalTime()));
+                    results.get(ticket.getCarrier()).add(getFlightTime(ticket));
                     Collections.sort(results.get(ticket.getCarrier()));
                 }
             }
@@ -60,6 +69,12 @@ public class TestIdeaPlatformApplication {
         for (Map.Entry<String, List<Duration>> result : results.entrySet()) {
             System.out.println("For Carrier " + result.getKey() + " is minimum flight time: " + result.getValue().get(0));
         }
+    }
+
+    private static Duration getFlightTime(Ticket ticket){
+        LocalTime start = LocalTime.of(ticket.getDepartureTime().getHour(), ticket.getDepartureTime().getMinute());
+        LocalTime end = LocalTime.of(ticket.getArrivalTime().getHour(), ticket.getArrivalTime().getMinute());
+        return Duration.between(start, end);
     }
 
     private static  BigDecimal median(Tickets tickets){

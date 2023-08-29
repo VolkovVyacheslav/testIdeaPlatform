@@ -29,7 +29,7 @@ public class Ticket {
    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yy")
    private LocalDate arrivalDate;
    @JsonProperty("arrival_time")
-   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "H:MM")
+   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "H:mm")
    private LocalTime arrivalTime;
    private String carrier;
    private Integer stops;
